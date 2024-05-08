@@ -158,9 +158,7 @@ int page ::total_pages = 0;
 		}
 	}
 	// halo
-	void a() {
-	cout<<"halo";
-	};
+	
  };
 
 
