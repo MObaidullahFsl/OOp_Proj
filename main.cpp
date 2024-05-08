@@ -52,9 +52,10 @@ protected:
 	string owner; // user needed
 	int likes;
 	static int total_posts;
+	vector<string> comments;
 
 public:
-	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber=0, string activcontent = "" ) : id(ID), date(Date), month(Month), content(Content), owner(Owner), likes(Likes) {
+	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber=0, string activcontent = "",vector<string> Comments = {} ) : id(ID), date(Date), month(Month), content(Content), owner(Owner), likes(Likes), comments(Comments) {
 		activity = new activ(activcontent, activnumber);
 	}
 	~post() {};
@@ -111,7 +112,8 @@ int page ::total_pages = 0;
 		for (int i = 0; i < total_pages; i++) {
 		string id, name, a; vector<string> posts;
 		pages_file >> id;
-		pages_file >> name;
+		getline(pages_file,name,'1');
+		//pages_file >> name;
 		pages_file >> a;
 			while (a != "-1") {
 				posts.push_back(a);
@@ -133,13 +135,15 @@ int page ::total_pages = 0;
 			posts_file >> likes;
 			posts_file >> date;
 			posts_file >> month;
-			posts_file.ignore(256, '\n');
-			getline(posts_file, content);
-
-			posts_file >> activ_number;
-			getline(posts_file, activ_content);
+			//posts_file.ignore(256, '\n');
+			getline(posts_file, content, '1');
+			getline(posts_file, activ_content,'1');
+			if (activ_content != " ") {
+				posts_file >> activ_number;
+			}else
+				activ_number = 0;
 			//posts_file >> activ_content;
-			posts_file.ignore(256, '\n');
+			//posts_file.ignore(256, '\n');
 			posts_file >> owner;
 			
 			posts_file >> a;
@@ -148,12 +152,15 @@ int page ::total_pages = 0;
 				posts_file >> a;
 			}
 
-			posts_list.push_back(post(id, date, month, content, owner, likes, activ_number, activ_content));
+			posts_list.push_back(post(id, date, month, content, owner, likes, activ_number, activ_content, comments));
 
 
 		}
 	}
 	// halo
+	void a() {
+	cout<<"halo";
+	};
  };
 
 
