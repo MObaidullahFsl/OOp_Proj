@@ -23,6 +23,8 @@ public:
 		
 		has_page = false;
 	}
+		string getID() { return id; }
+		string getName() { return name; }
 };
 class page {
 protected:
@@ -157,6 +159,67 @@ int page ::total_pages = 0;
 
 		}
 	}
+	int UserAuth() {
+
+		cout << "Enter Your Username or Id:		-1 to exit \n";
+		string id; cin >> id;
+		int a=0;int c = 0;
+		while (true) {
+
+			for (int i = 0; i < total_users; i++) {
+				if (users_list[i].getID() == id || users_list[i].getName() == id) {
+					a = i;
+					c++;
+				}
+			}
+
+			if (id == "-1") {
+				c = -1;
+			}
+			switch (c) {
+			case 0:
+				cout << "User Not Found" << endl;
+				UserAuth();
+				break;
+			case 1:
+				cout << "Logged in Successfully" << endl;
+				cout << "Welcome " << users_list[a].getName() << endl;
+				return a;
+				break;
+			case -1:
+				return -1;
+			default:
+				cout << "Unexpected Error!" << endl;
+				UserAuth();
+				break;
+			}
+		}
+	}
+
+
+
+
+	void MainMenu() {
+		cout << "================================================================================================================";
+		cout<<"							WELCOME TO OOP PROJECT"<<endl;
+		cout << "================================================================================================================\n";
+		int userN0=UserAuth();
+		if (userN0 == -1) {
+			cout << "Exiting!"; 
+		}
+		else {
+		// Found user
+				user u = users_list[userN0];
+
+
+
+
+
+
+
+
+		}
+	}
 	// halo
 	
  };
@@ -167,5 +230,6 @@ int main() {
 	r.readUsers();
 	r.readPages();
 	r.readPosts();
+	r.MainMenu();
 //hehehe
 }
