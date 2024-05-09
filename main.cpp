@@ -3,6 +3,7 @@
 //#include"Header.h"
 #include<fstream>
 #include<string>
+#include<ctime>
 using namespace std;
 class page;
 class activ;
@@ -25,6 +26,10 @@ public:
 	}
 		string getID() { return id; }
 		string getName() { return name; }
+		vector<string> getPosts() { return posts; }
+		vector<string> getPages() { return pages_followed; }
+		vector<string> getFriends() { return friends_list; }
+		string getId() { return id; }
 };
 class page {
 protected:
@@ -45,10 +50,38 @@ class activ {
 public:
 	activ(string Content = "", int Number = 0) : content(Content), number(Number) {}
 };
+class kronos {
+protected:
+	//string timeString;
+	int month, date,year, hour, min;
+
+public:
+	kronos(struct tm* localTime) {
+
+		date = localTime->tm_mday;
+		month = localTime->tm_mon + 1; // tm_mon is 0-indexed, so add 1
+		year = localTime->tm_year + 1900; // tm_year is years since 1900
+		hour = localTime->tm_hour;
+		min = localTime->tm_min;
+		/*time_t now = time(0);
+		char buffer[30] = {};
+		
+	timeString = ctime_s(buffer, 30, &now);
+	timeString = buffer;*/
+
+	}
+	kronos(int Year = 0, int Month = 0, int Date = 0, int Hour = 0, int Min = 0): year(Year), month(Month), date(Date), hour(Hour), min(Min) {
+
+	}
+	int getDate() { return date; }
+	//void displayTime() const {
+	//	std::cout << "Current date and time: " << timeString;
+	//}
+};
 class post {
 protected:
 	string id;
-	int date, month;
+	kronos time_added;
 	string content;
 	activ *activity;
 	string owner; // user needed
@@ -57,11 +90,15 @@ protected:
 	vector<string> comments;
 
 public:
-	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber=0, string activcontent = "",vector<string> Comments = {} ) : id(ID), date(Date), month(Month), content(Content), owner(Owner), likes(Likes), comments(Comments) {
+	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber=0, string activcontent = "",vector<string> Comments = {} , int hours = 0, int min = 0, int year =0) : id(ID), content(Content), owner(Owner), likes(Likes), comments(Comments) {
 		activity = new activ(activcontent, activnumber);
+		time_added = kronos(year,Month, Date, hours, min);
 	}
 	~post() {};
-
+	
+	string getOwner() { return owner; }
+	string getId() { return id; }
+	int getDate() { return time_added.getDate(); }
 
 	
 
@@ -129,14 +166,17 @@ int page ::total_pages = 0;
 		fstream posts_file("Posts.txt");
 		posts_file >> post::total_posts;
 		for (int i = 0; i < total_posts; i++) {
-			string id, content,activ_content,a,owner;
-			int date, month, likes, activ_number;
+			string id, content, activ_content, a, owner;
+			int date, month, likes, activ_number, hours, min,year;
 			vector<string> comments;
 
 			posts_file>>id;
 			posts_file >> likes;
-			posts_file >> date;
+			posts_file >> year;
 			posts_file >> month;
+			posts_file >> date;
+			posts_file >> hours;
+			posts_file >> min;
 			//posts_file.ignore(256, '\n');
 			getline(posts_file, content, '1');
 			getline(posts_file, activ_content,'1');
@@ -154,7 +194,7 @@ int page ::total_pages = 0;
 				posts_file >> a;
 			}
 
-			posts_list.push_back(post(id, date, month, content, owner, likes, activ_number, activ_content, comments));
+			posts_list.push_back(post(id, date, month, content, owner, likes, activ_number, activ_content, comments, hours, min, year));
 
 
 		}
@@ -195,7 +235,35 @@ int page ::total_pages = 0;
 			}
 		}
 	}
+	void MakeHome(int userNo) {
+		vector<string> friends = users_list[userNo].getFriends();
+		vector<string> pages = users_list[userNo].getPages();
+		vector<string>home_posts;
+		time_t now = time(0);
+		tm *ltm = localtime(&now);
+		int date = ltm->tm_mday;
 
+		for (auto& i : posts_list) {
+			for (auto& j : friends) {
+				
+					if (j == i.getOwner() && i.getDate() > date-1) {
+						home_posts.push_back(i.getId());
+					}
+			}
+				for (auto& j : pages) {
+				
+					if (j == i.getOwner() && i.getDate() > date-1) {
+						home_posts.push_back(i.getId());
+					}
+				
+				}
+
+
+		}
+
+
+
+	}
 
 
 
@@ -211,7 +279,7 @@ int page ::total_pages = 0;
 		// Found user
 				user u = users_list[userN0];
 
-
+				MakeHome(userN0);
 
 
 
@@ -227,6 +295,7 @@ int page ::total_pages = 0;
 
 int main() {
 	Runner r;
+	
 	r.readUsers();
 	r.readPages();
 	r.readPosts();
