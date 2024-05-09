@@ -8,6 +8,7 @@ using namespace std;
 class page;
 class activ;
 class post;
+class comment;
 class user {
 protected:
 	string id;
@@ -115,15 +116,28 @@ public:
 
 
 };
+class comment {
+protected:
+	string id, owner_post, owner_user, content;
+	static int total_comments;
+public:
+	comment(string ID = "", string Owner_Post = "", string Owner_User = "", string Content = "") : id(ID), owner_post(Owner_Post), owner_user(Owner_User), content(Content) {}
+	~comment() {};
+	string getId() { return id; }
+	string getOwnerPost() { return owner_post; }
+	string getOwnerUser() { return owner_user; }
+	string getContent() { return content; }
+};
 int post::total_posts = 0;
 int user ::total_users = 0;
 int page ::total_pages = 0;
-
- class Runner : public user, public page, public post {
+int comment ::total_comments = 0;
+ class Runner : public user, public page, public post ,public comment {
  public:
 	 vector<user>users_list;
 	 vector<page>pages_list;
 	 vector<post>posts_list;
+	 vector<comment>comments_list;
 	 vector<post>home_posts;
 	void readUsers() {
 	//vector<user> users_list;
@@ -210,6 +224,20 @@ int page ::total_pages = 0;
 
 		}
 	}
+	void readComments() {
+		fstream comments_file("Comments.txt");
+		comments_file >> comment::total_comments;
+		for (int i = 0; i < total_comments; i++) {
+			string id, owner_post, owner_user, content;
+			comments_file >> id;
+			comments_file >> owner_post;
+			comments_file >> owner_user;
+			getline(comments_file, content, '\n');
+
+			comments_list.push_back(comment(id, owner_post, owner_user, content));
+		}
+	}
+
 	int UserAuth() {
 
 		cout << "Enter Your Username or Id:				-1 to exit \n";
@@ -314,7 +342,19 @@ int page ::total_pages = 0;
 				user u = users_list[userN0];
 
 				MakeHome(userN0);
-				printHome(userN0);
+				cout<<"Select an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View Followed Pages \n 6. View Friends \n any another to exit\n";
+
+				int a; cin >> a;
+				switch (a)
+				{
+				case 1:
+					printHome(userN0);
+					break;
+
+				default:
+					exit;
+				}
+				
 
 
 
@@ -333,6 +373,7 @@ int main() {
 	r.readUsers();
 	r.readPages();
 	r.readPosts();
+	r.readComments();
 	r.MainMenu();
 //hehehe
 }
