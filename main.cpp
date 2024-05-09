@@ -49,6 +49,9 @@ class activ {
 		int number;
 public:
 	activ(string Content = "", int Number = 0) : content(Content), number(Number) {}
+
+	string getContent() { return content; }
+	int getNumber() { return number; }
 };
 class kronos {
 protected:
@@ -74,6 +77,8 @@ public:
 
 	}
 	int getDate() { return date; }
+	int getMonth() { return month; }
+	int getYear() { return year; }
 	//void displayTime() const {
 	//	std::cout << "Current date and time: " << timeString;
 	//}
@@ -99,7 +104,12 @@ public:
 	string getOwner() { return owner; }
 	string getId() { return id; }
 	int getDate() { return time_added.getDate(); }
-
+	int getMonth() { return time_added.getMonth(); }
+	int getYear() { return time_added.getYear(); }
+	string getContent() { return content; }
+	int getLikes() { return likes; }
+	vector<string> getComments() { return comments; }
+	activ* getActivity() { return activity; }
 	
 
 
@@ -114,6 +124,7 @@ int page ::total_pages = 0;
 	 vector<user>users_list;
 	 vector<page>pages_list;
 	 vector<post>posts_list;
+	 vector<post>home_posts;
 	void readUsers() {
 	//vector<user> users_list;
 	fstream users_file("Users.txt");
@@ -201,7 +212,7 @@ int page ::total_pages = 0;
 	}
 	int UserAuth() {
 
-		cout << "Enter Your Username or Id:		-1 to exit \n";
+		cout << "Enter Your Username or Id:				-1 to exit \n";
 		string id; cin >> id;
 		int a=0;int c = 0;
 		while (true) {
@@ -210,6 +221,7 @@ int page ::total_pages = 0;
 				if (users_list[i].getID() == id || users_list[i].getName() == id) {
 					a = i;
 					c++;
+					break;
 				}
 			}
 
@@ -235,41 +247,63 @@ int page ::total_pages = 0;
 			}
 		}
 	}
+	bool DateAuthHome(post i) {
+		time_t now = time(0);
+		struct tm ltm;
+		localtime_s(&ltm, &now); // Corrected usage of localtime_s
+		int date = ltm.tm_mday;int month=ltm.tm_mon + 1; int year=ltm.tm_year + 1900;
+		
+		if (year == i.getYear() && month == i.getMonth() && (date == i.getDate()) || (date == i.getDate() - 1)) {
+			return true;
+		}
+		else 
+			return false;
+
+
+
+	}
 	void MakeHome(int userNo) {
 		vector<string> friends = users_list[userNo].getFriends();
 		vector<string> pages = users_list[userNo].getPages();
-		vector<string>home_posts;
-		time_t now = time(0);
-		tm *ltm = localtime(&now);
-		int date = ltm->tm_mday;
-
+		
 		for (auto& i : posts_list) {
-			for (auto& j : friends) {
-				
-					if (j == i.getOwner() && i.getDate() > date-1) {
-						home_posts.push_back(i.getId());
+			if (DateAuthHome(i)) {
+				for (auto& j : friends) {
+
+					if (j == i.getOwner() ) {
+						home_posts.push_back(i);
 					}
-			}
+				}
 				for (auto& j : pages) {
-				
-					if (j == i.getOwner() && i.getDate() > date-1) {
-						home_posts.push_back(i.getId());
+
+					if (j == i.getOwner() ) {
+						home_posts.push_back(i);
 					}
-				
+
 				}
 
-
+			}
 		}
 
 
 
 	}
-
-
-
+	void printHome(int userno) {
+		cout << "================================================================================================================\n";
+		cout<<"									Home Page \n";
+		cout << "================================================================================================================\n";
+		cout << "User: "<<users_list[userno].getName() << endl;
+		cout << "These are the latest Posts in your feed: \n";
+		
+		for (auto& i : home_posts) {
+			activ *a = i.getActivity();
+			cout <<"\n" << i.getOwner() << " said: \n " << i.getContent() << "			likes: " << i.getLikes() << "\n " << a->getContent() << " " << a->getNumber() << " \n\n view comments? ";
+		}
+	
+	}
 	void MainMenu() {
 		cout << "================================================================================================================";
-		cout<<"							WELCOME TO OOP PROJECT"<<endl;
+		cout<<"								 WELCOME TO OOP PROJECT"<<endl;
 		cout << "================================================================================================================\n";
 		int userN0=UserAuth();
 		if (userN0 == -1) {
@@ -280,7 +314,7 @@ int page ::total_pages = 0;
 				user u = users_list[userN0];
 
 				MakeHome(userN0);
-
+				printHome(userN0);
 
 
 
