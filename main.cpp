@@ -25,7 +25,7 @@ public:
 		
 		has_page = false;
 	}
-		string getID() { return id; }
+
 		string getName() { return name; }
 		vector<string> getPosts() { return posts; }
 		vector<string> getPages() { return pages_followed; }
@@ -246,7 +246,7 @@ int comment ::total_comments = 0;
 		while (true) {
 
 			for (int i = 0; i < total_users; i++) {
-				if (users_list[i].getID() == id || users_list[i].getName() == id) {
+				if (users_list[i].getId() == id || users_list[i].getName() == id) {
 					a = i;
 					c++;
 					break;
@@ -318,20 +318,36 @@ int comment ::total_comments = 0;
 	}
 	void printHome(int userno) {
 		cout << "================================================================================================================\n";
-		cout<<"									Home Page \n";
+		cout<<"	\t\t\t\tHome Page \n";
 		cout << "================================================================================================================\n";
 		cout << "User: "<<users_list[userno].getName() << endl;
 		cout << "These are the latest Posts in your feed: \n";
-		
-		for (auto& i : home_posts) {
-			activ *a = i.getActivity();
-			cout <<"\n" << i.getOwner() << " said: \n " << i.getContent() << "			likes: " << i.getLikes() << "\n " << a->getContent() << " " << a->getNumber() << " \n\n view comments? ";
+		if (home_posts.size()==0) {
+			cout << "\n\tnothing in your feed follow more pages\n";
+		}
+		else {
+			for (auto& i : home_posts) {
+				activ* a = i.getActivity();
+				string name;
+				for (auto & j:users_list) {
+					
+					if(i.getOwner()==j.getId()){
+					
+					 name = j.getName();
+					break;
+					}
+				
+				}
+				cout << "\n\n" << name << " said: \n " << i.getContent() << "			likes: " << i.getLikes() << "\n " << a->getContent() << " " << a->getNumber() << " \n\n comments : ";
+
+			}
+
 		}
 	
 	}
 	void MainMenu() {
 		cout << "================================================================================================================";
-		cout<<"								 WELCOME TO OOP PROJECT"<<endl;
+		cout<<"	\t\t\t\tWELCOME TO OOP PROJECT"<<endl;
 		cout << "================================================================================================================\n";
 		int userN0=UserAuth();
 		if (userN0 == -1) {
