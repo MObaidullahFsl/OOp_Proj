@@ -139,34 +139,34 @@ int post::total_posts = 0;
 int user ::total_users = 0;
 int page ::total_pages = 0;
 int comment ::total_comments = 0;
- class Runner : public user, public page, public post ,public comment {
- public:
-	 vector<user>users_list;
-	 vector<page>pages_list;
-	 vector<post>posts_list;
-	 vector<comment>comments_list;
-	 vector<post>home_posts;
-	 
-	void readUsers() {
-	//vector<user> users_list;
-	fstream users_file("Users.txt");
-	
+class Runner : public user, public page, public post, public comment {
+public:
+	vector<user>users_list;
+	vector<page>pages_list;
+	vector<post>posts_list;
+	vector<comment>comments_list;
+	vector<post>home_posts;
 
-	users_file >> user::total_users;
+	void readUsers() {
+		//vector<user> users_list;
+		fstream users_file("Users.txt");
+
+
+		users_file >> user::total_users;
 		for (int i = 0; i < total_users; i++) {
-			string id, name, a; vector<string> friends,pages,posts;bool has_page;
+			string id, name, a; vector<string> friends, pages, posts; bool has_page;
 			users_file >> id;
 			users_file >> name;
 			users_file >> a;
 			while (a != ";") {
 				friends.push_back(a);
 				users_file >> a;
-					}
-				users_file >> a;
+			}
+			users_file >> a;
 			while (a != ";") {
 				pages.push_back(a);
 				users_file >> a;
-						}
+			}
 			users_file >> a;
 			while (a != ";") {
 				posts.push_back(a);
@@ -174,28 +174,28 @@ int comment ::total_comments = 0;
 			}
 			users_file >> has_page;
 
-				users_list.push_back(user(id, name, friends, pages, posts, has_page));
-	
+			users_list.push_back(user(id, name, friends, pages, posts, has_page));
+
 		}
-	
+
 	}
 	void readPages() {
 		fstream pages_file("Pages.txt");
 		pages_file >> page::total_pages;
 		for (int i = 0; i < total_pages; i++) {
 			string id, name, a, owner; vector<string> posts; int followers;
-		pages_file >> id;
-		getline(pages_file,name,'1');
-		//pages_file >> name;
-		pages_file >> a;
+			pages_file >> id;
+			getline(pages_file, name, '1');
+			//pages_file >> name;
+			pages_file >> a;
 			while (a != "-1") {
 				posts.push_back(a);
 				pages_file >> a;
 			}
 			pages_file >> owner; pages_file >> followers;
-			
-			pages_list.push_back(page(id, name, posts,owner,followers));
-			
+
+			pages_list.push_back(page(id, name, posts, owner, followers));
+
 		}
 	}
 	void readPosts() {
@@ -203,10 +203,10 @@ int comment ::total_comments = 0;
 		posts_file >> post::total_posts;
 		for (int i = 0; i < total_posts; i++) {
 			string id, content, activ_content, a, owner;
-			int date, month, likes, activ_number, hours, min,year;
+			int date, month, likes, activ_number, hours, min, year;
 			vector<string> comments;
 
-			posts_file>>id;
+			posts_file >> id;
 			posts_file >> likes;
 			posts_file >> year;
 			posts_file >> month;
@@ -215,15 +215,16 @@ int comment ::total_comments = 0;
 			posts_file >> min;
 			//posts_file.ignore(256, '\n');
 			getline(posts_file, content, '1');
-			getline(posts_file, activ_content,'1');
+			getline(posts_file, activ_content, '1');
 			if (activ_content != " ") {
 				posts_file >> activ_number;
-			}else
+			}
+			else
 				activ_number = 0;
 			//posts_file >> activ_content;
 			//posts_file.ignore(256, '\n');
 			posts_file >> owner;
-			
+
 			posts_file >> a;
 			while (a != "-1") {
 				comments.push_back(a);
@@ -248,7 +249,9 @@ int comment ::total_comments = 0;
 			comments_list.push_back(comment(id, owner_post, owner_user, content));
 		}
 	}
-	
+
+
+
 	string getUserName(string id) {
 		int count = 0;
 		for (auto& i : users_list) {
@@ -262,28 +265,28 @@ int comment ::total_comments = 0;
 		}
 	}
 	string getPageName(string id) {
-	int count = 0;
-	for (auto& i : pages_list) {
-		if (id == i.getId()) {
-			count++;
-			return i.getName();
+		int count = 0;
+		for (auto& i : pages_list) {
+			if (id == i.getId()) {
+				count++;
+				return i.getName();
+			}
 		}
-	}
-	if (count == 0) {
-	return "page not found err";
-	}
+		if (count == 0) {
+			return "page not found err";
+		}
 	}
 	int UserAuth() {
 
 		cout << "Enter Your Username or Id:				-1 to exit \n";
 		string id; cin >> id;
-		int a = 0; int c = 0; bool condition=true;
+		int a = 0; int c = 0; bool condition = true;
 		while (condition) {
 			c = 0;
 			for (auto& i : users_list) {
 				a++;
 				if (i.getId() == id || i.getName() == id) {
-					
+
 					c++;
 					break;
 				}
@@ -299,8 +302,8 @@ int comment ::total_comments = 0;
 				break;
 			case 1:
 				cout << "Logged in Successfully" << endl;
-				cout << "Welcome " << users_list[a-1].getName() << endl;
-				
+				cout << "Welcome " << users_list[a - 1].getName() << endl;
+
 				return a;
 				break;
 			case -1:
@@ -316,19 +319,19 @@ int comment ::total_comments = 0;
 		time_t now = time(0);
 		struct tm ltm;
 		localtime_s(&ltm, &now); // Corrected usage of localtime_s
-		int date = ltm.tm_mday;int month=ltm.tm_mon + 1; int year=ltm.tm_year + 1900;
-		
-		if (year == i.getYear() && month == i.getMonth() && (date == i.getDate()) || (date-1== i.getDate() )) {
+		int date = ltm.tm_mday; int month = ltm.tm_mon + 1; int year = ltm.tm_year + 1900;
+
+		if (year == i.getYear() && month == i.getMonth() && (date == i.getDate()) || (date - 1 == i.getDate())) {
 			return true;
 		}
-		else 
+		else
 			return false;
 
 
 
 	}
-	void MakeHome(int userno) {
-		int userNo = userno - 1;
+	void MakeHome(int userNo) {
+		
 		vector<string> friends = users_list[userNo].getFriends();
 		vector<page> followed_pages;
 		for (auto& j : pages_list) {
@@ -345,12 +348,12 @@ int comment ::total_comments = 0;
 			if (DateAuthHome(i)) {
 				for (auto& j : friends) {
 
-					if (j == i.getOwner() ) {
+					if (j == i.getOwner()) {
 						home_posts.push_back(i);
 					}
-				
+
 				}
-				for (auto& j: followed_pages) {
+				for (auto& j : followed_pages) {
 					for (auto& k : j.getPosts()) {
 						if (i.getId() == k) {
 							home_posts.push_back(i);
@@ -376,16 +379,16 @@ int comment ::total_comments = 0;
 			return "user not found err";
 		}
 	}
-	void getName(string id,int userno,bool &isPage, string &ownername, string &pagename ) {
+	void getName(string id, int userno, bool& isPage, string& ownername, string& pagename) {
 		// is this post of our friend?
-		 
-		for (auto& i: users_list[userno].getFriends()) {
+
+		for (auto& i : users_list[userno].getFriends()) {
 			if (id == i) {
 				// is our friend
 				ownername = i;
 				isPage = false;
 				return;
-				
+
 			}
 		}
 
@@ -411,24 +414,39 @@ int comment ::total_comments = 0;
 
 			}
 		}
-		
+
 
 	}
-	
-	
+
+
 	void AddCommentToFile() {
 		fstream comments_file("Comments.txt", ios::app);
 		comments_file.seekp(0, ios::end);
 		int size = comments_list.size();
-		comments_file << comments_list[size-1].getId()<<" "<< comments_list[size-1].getOwnerPost() << " " << comments_list[size-1].getOwnerUser() << " " << comments_list[size-1].getContent() << endl;
+		comments_file << comments_list[size - 1].getId() << " " << comments_list[size - 1].getOwnerPost() << " " << comments_list[size - 1].getOwnerUser() << " " << comments_list[size - 1].getContent() << endl;
 
 	}
-	void printHome(int userno) {
+	void PrintPostComments(string id) {
+		for (auto& j : comments_list) {
+			if (j.getOwnerPost() == id) {
+
+				//get owner name
+				string name = getUserName(j.getOwnerUser());
+			
+				cout << name << " commented :\t " << j.getContent() << "\n\n";
+			}
+		}
+				for (int p = 0; p < 100; p++) { cout << "-"; }
+				cout << endl;
+
+	}
+	void printHome(int userno,user* u) {
+		system("cls");
 		
-		cout << "================================================================================================================\n";
-		cout<<"	\t\t\t\tHome Page \n";
-		cout << "================================================================================================================\n";
-		cout << "User: "<<users_list[userno].getName() << endl;
+		for (int p = 0; p < 100; p++) { cout << "="; }
+		cout << endl; cout<<"	\t\t\t\tHome Page \n";
+		for (int p = 0; p < 100; p++) { cout << "="; }
+		cout << endl; cout << "User: "<<users_list[userno].getName() << endl;
 		cout << "\t\tThese are the latest Posts in your feed: \n\n";
 		if (home_posts.size()==0) {
 			cout << "\n\tnothing in your feed follow more pages\n";
@@ -441,20 +459,19 @@ int comment ::total_comments = 0;
 				getName(i.getOwner(), userno, isFromPage, ownername, pagename);
 				
 				if (!isFromPage) {
+					for (int p = 0; p < 100; p++) { cout << "_"; }
+					cout << endl;
 					cout << "\n\nPost id: " << i.getId() << "\t\t\t\t Dated : " << i.getDate() << "/" << i.getMonth() << "/" << i.getYear() << "\n\nYour Friend " << ownername << " said: \t\t " << i.getContent() << "\t\tlikes: " << i.getLikes() << "\n " << a->getContent() << " " << a->getNumber() << " \n\n comments : \n";
+					
 
 				}else
+					for (int p = 0; p < 100; p++) { cout << "-"; }
+				cout << endl;
 				cout <<"\n\nPost id: " << i.getId() << "\t\t\t\t Dated : " << i.getDate() << "/" << i.getMonth() << "/" << i.getYear() << "\n\n posted by " <<ownername<<" on "<< pagename << "  :  " << i.getContent() << "\t\tlikes: " << i.getLikes() << "\n " << a->getContent() << " " << a->getNumber() << " \n\n comments : \n";
 				
-				for (auto & j: comments_list) {
-					if (j.getOwnerPost() == i.getId()) {
 
-						//get owner name
-						string name =getUserName(j.getOwnerUser());
-						cout<<name<<" commented :\t "<<j.getContent()<<"\n\n";
-
-					}
-				}
+				PrintPostComments(i.getId());
+			
 				
 			}
 
@@ -475,23 +492,57 @@ int comment ::total_comments = 0;
 		}
 		else {
 			system("cls");
-			MainMenu(userno);
+			MainMenu(u,userno);
 		}
 		
 	
 	}
-	void Explore(int userno) {
+
+	void PageView(string id, int userno, user* u) {
+		system("cls");
+		page* p=nullptr;
+		for (auto& i : pages_list) {
+			if (i.getId() == id) {
+			p = &i;
+			break;
+			}
+		}
+		cout<<"Id: " << p->getId() << "\t\tName: " << p->getName() << "\t\t" << p->getFollowers() << " Followers" << endl;
+		cout << "\nPosts: \n\n";
+		for (auto& i : p->getPosts()) {
+			post* b=nullptr;
+			for (auto& j : posts_list) {
+				if (j.getId() == i) 
+				{
+						b = &j;
+				}
+			}
+
+				cout<<"\nPosted by: "<<b->getOwner() << " \nPost id: " << b->getId() << "\t\t\t Dated : " << b->getDate() << "/" << b->getMonth() << "/" << b->getYear() << "\n\n " << b->getContent() << "\t\tlikes: " << b->getLikes() << "\n\n comments : \n";
+			PrintPostComments(b->getId());
+		}
+		cout << "\n\n";
+			system("pause");
+			MainMenu(u,userno);
+	}
+	void Explore(int userno, user * u) {
+		system("cls");
 		cout << "Explore Other Pages!!\n\n";
 		for (auto& i : pages_list) {
-			cout << i.getName() << "\t" ;
-			
-		}
+			cout <<"Id: " << i.getId() << "\t\tName: " << i.getName() << "\t\t" << i.getFollowers() << " Followers" << endl;
+			}
+		cout<<"Enter page id to visit or -1 to exit: \n"; string id; cin >> id;
+		if (id == "-1")
+		{
+			MainMenu( u,userno);
+		}else
+		PageView(id, userno,u);
 		system("cls");
-		void MainMenu(int userN0);
+		 MainMenu(u, userno);
 
 	}
 
-	void ViewProfile(int userno) {
+	void ViewProfile(int userno, user * u) {
 		
 		for (int i = 0; i < 10; i++) { cout << "="; }
 		cout << "\n";
@@ -500,38 +551,49 @@ int comment ::total_comments = 0;
 		cout << "Friends list: \n";
 		for (auto& i : users_list[userno].getFriends()) {cout<<getUserName(i)<<"\n";}
 		cout << "\nFollowed Pages list: \n";
-		for (auto& i : users_list[userno].getPages()) {cout << getPageName(i) << "\n"; }
+		for (auto& i : users_list[userno].getPages()) {cout << getPageName(i) << "\n\n"; }
+		system("pause");
 		system("cls");
-		void MainMenu(int userN0);
+		 MainMenu( u,userno);
 
 	}
-
-		void MainMenu(int userN0) {
-	
-				cout<<"\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View Followed Pages \n 6. View Friends \n any another to exit\n";
+	void viewTimeline(int userno, user* u) {
+		system("cls");
+		cout << "This is your TimeLine \n";
+	}
+	void MainMenu(user* u,int userN0) {
+	//system("cls");
+				cout<<"\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View a Page \n 6. View TimeLine \n any another to exit\n";
 
 				int a; cin >> a;
+					string id; 
 				switch (a)
 				{
 				case 1:
-					printHome(userN0);
+					printHome(userN0,u);
 					break;
 				case 2:
-					Explore(userN0);
+					Explore(userN0,u);
 					break;
 				case 3:
-					ViewProfile(userN0);
+					ViewProfile(userN0,u);
+				case 4:
+					void shareMemories();
+					break;
+				case 5:
+					cout << "Enter page id: \n";
+					cin >> id;
+					PageView(id, userN0,u);
+					break;
+				case 6:
+					viewTimeline(userN0,u);
+					break;
 				default:
-					exit;
+					exit(0);
 				}
 				
-
-
-
-
-
-		}
-		void StartApp() {
+	}
+	void StartApp() {
 			cout << "================================================================================================================";
 			cout << "	\t\t\t\t\tWELCOME TO OOP PROJECT" << endl;
 			cout << "================================================================================================================\n";
@@ -544,11 +606,11 @@ int comment ::total_comments = 0;
 			}
 		
 			// Found user
-			user u = users_list[userN0-1];
+			user* u =& users_list[userN0-1];
 			userN0 = userN0 - 1;
 
 			MakeHome(userN0);
-			MainMenu(userN0);
+			MainMenu(u,userN0);
 		
 			
 		}
