@@ -23,12 +23,12 @@ public:
 		readPosts();
 		readComments();
 	}
-	vector<user>users_list;
-	vector<page>pages_list;
-	vector<post>posts_list;
-	vector<comment>comments_list;
-	vector<post>home_posts;
-
+	vector<user*>users_list;
+	vector<page*>pages_list;
+	vector<post*>posts_list;
+	vector<comment*>comments_list;
+	vector<post*>home_posts;
+	bool ended = false;
 	void readUsers() {
 		//vector<user> users_list;
 		fstream users_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Backup\\txt\\Users.txt");
@@ -56,7 +56,7 @@ public:
 				}
 			users_file >> has_page;
 
-			users_list.push_back(user(id, name, friends, pages, posts, has_page));
+			users_list.push_back(new user(id, name, friends, pages, posts, has_page));
 
 			}
 
@@ -86,7 +86,7 @@ public:
 				}
 				pages_file >> owner; pages_file >> followers;
 
-				pages_list.push_back(page(id, name, posts, owner, followers));
+				pages_list.push_back(new page(id, name, posts, owner, followers));
 
 			}
 
@@ -137,7 +137,7 @@ public:
 					posts_file >> a;
 				}
 
-				posts_list.push_back(post(id, date, month, content, owner, likes, activ_number, activ_content, comments, hours, min, year));
+				posts_list.push_back(new post(id, date, month, content, owner, likes, activ_number, activ_content, comments, hours, min, year));
 
 
 			}
@@ -167,7 +167,7 @@ public:
 				comments_file >> owner_user;
 				getline(comments_file, content, '\n');
 
-				comments_list.push_back(comment(id, owner_post, owner_user, content));
+				comments_list.push_back(new comment(id, owner_post, owner_user, content));
 			}
 		}
 		else {
@@ -177,14 +177,14 @@ public:
 		
 	}
 
-
+	~Runner();
 
 	string getUserName(string id) {
 		int count = 0;
 		for (auto& i : users_list) {
-			if (id == i.getId()) {
+			if (id == i->getId()) {
 				count++;
-				return i.getName();
+				return i->getName();
 			}
 		}
 		if (count == 0) {
@@ -194,9 +194,9 @@ public:
 	string getPageName(string id) {
 		int count = 0;
 		for (auto& i : pages_list) {
-			if (id == i.getId()) {
+			if (id == i->getId()) {
 				count++;
-				return i.getName();
+				return i->getName();
 			}
 		}
 		if (count == 0) {
@@ -212,7 +212,7 @@ public:
 			c = 0;
 			for (auto& i : users_list) {
 				a++;
-				if (i.getId() == id || i.getName() == id) {
+				if (i->getId() == id || i->getName() == id) {
 
 					c++;
 					break;
@@ -229,7 +229,7 @@ public:
 				break;
 			case 1:
 				cout << "Logged in Successfully" << endl;
-				cout << "Welcome " << users_list[a - 1].getName() << endl;
+				cout << "Welcome " << users_list[a - 1]->getName() << endl;
 
 				return a;
 				break;
@@ -259,12 +259,12 @@ public:
 	}
 	void MakeHome(int userNo) {
 
-		vector<string> friends = users_list[userNo].getFriends();
+		vector<string> friends = users_list[userNo]->getFriends();
 		vector<page> followed_pages;
 		for (auto& j : pages_list) {
-			for (auto& k : users_list[userNo].getPages()) {
-				if (j.getId() == k) {
-					followed_pages.push_back(j);
+			for (auto& k : users_list[userNo]->getPages()) {
+				if (j->getId() == k) {
+					followed_pages.push_back(*j);
 				}
 			}
 
@@ -272,17 +272,17 @@ public:
 
 
 		for (auto& i : posts_list) {
-			if (DateAuthHome(i)) {
+			if (DateAuthHome(*i)) {
 				for (auto& j : friends) {
 
-					if (j == i.getOwner()) {
+					if (j == i->getOwner()) {
 						home_posts.push_back(i);
 					}
 
 				}
 				for (auto& j : followed_pages) {
 					for (auto& k : j.getPosts()) {
-						if (i.getId() == k) {
+						if (i->getId() == k) {
 							home_posts.push_back(i);
 						}
 					}
@@ -297,9 +297,9 @@ public:
 	string getPostUser(string id) {
 		int count = 0;
 		for (auto& i : posts_list) {
-			if (id == i.getId()) {
+			if (id == i->getId()) {
 				count++;
-				return i.getOwner();
+				return i->getOwner();
 			}
 		}
 		if (count == 0) {
@@ -309,7 +309,7 @@ public:
 	void getName(string id, int userno, bool& isPage, string& ownername, string& pagename) {
 		// is this post of our friend?
 
-		for (auto& i : users_list[userno].getFriends()) {
+		for (auto& i : users_list[userno]->getFriends()) {
 			if (id == i) {
 				// is our friend
 				ownername = i;
@@ -322,9 +322,9 @@ public:
 		// must be a page we follows post
 		vector<page> followed_pages;
 		for (auto& j : pages_list) {
-			for (auto& k : users_list[userno].getPages()) {
-				if (j.getId() == k) {
-					followed_pages.push_back(j);
+			for (auto& k : users_list[userno]->getPages()) {
+				if (j->getId() == k) {
+					followed_pages.push_back(*j);
 				}
 			}
 
@@ -349,7 +349,7 @@ public:
 		fstream comments_file("Comments.txt", ios::app);
 		comments_file.seekp(0, ios::end);
 		int size = comments_list.size();
-		comments_file << comments_list[size - 1].getId() << " " << comments_list[size - 1].getOwnerPost() << " " << comments_list[size - 1].getOwnerUser() << " " << comments_list[size - 1].getContent() << endl;
+		comments_file << comments_list[size - 1]->getId() << " " << comments_list[size - 1]->getOwnerPost() << " " << comments_list[size - 1]->getOwnerUser() << " " << comments_list[size - 1]->getContent() << endl;
 
 	}
 	void ComposePost(user* &u, int userno) {
@@ -359,7 +359,7 @@ public:
 		cin.ignore();
 		getline(cin, description);
 		vector<string> empty;
-		posts_list.push_back(post(("m" + to_string(posts_list.size() + 1)), date, month, description, u->getId(), 0, 0, "", empty, 0, 0, year));
+		posts_list.push_back(new post(("m" + to_string(posts_list.size() + 1)), date, month, description, u->getId(), 0, 0, "", empty, 0, 0, year));
 		vector<string> newposts = u->getPosts();
 		newposts.push_back("m" + to_string(posts_list.size()));
 		u->setposts(newposts);
@@ -372,13 +372,13 @@ public:
 	void PrintPostComments(string id) {
 		int count = 0;
 		for (auto& j : comments_list) {
-			if (j.getOwnerPost() == id) {
+			if (j->getOwnerPost() == id) {
 
 				//get owner name
-				string name = getUserName(j.getOwnerUser());
+				string name = getUserName(j->getOwnerUser());
 				count++;
 				if (name != "") {
-					cout << name << " commented :\t " << j.getContent() << "\n\n";
+					cout << name << " commented :\t " << j->getContent() << "\n\n";
 				}
 			}
 		}
@@ -395,7 +395,7 @@ public:
 		for (int p = 0; p < 100; p++) { cout << "="; }
 		cout << endl; cout << "	\t\t\t\tHome Page \n";
 		for (int p = 0; p < 100; p++) { cout << "="; }
-		cout << endl; cout << "User: " << users_list[userno].getName() << endl;
+		cout << endl; cout << "User: " << users_list[userno]->getName() << endl;
 		cout << "\t\tThese are the latest Posts in your feed: \n\n";
 		if (home_posts.size() == 0) {
 			cout << "\n\tnothing to show here follow more pages or make more friends :)\n";
@@ -403,14 +403,14 @@ public:
 		else {
 			for (auto& i : home_posts) {
 				bool isFromPage = false;
-				activ* a = i.getActivity();
+				activ* a = i->getActivity();
 				string pagename, ownername; int c = 0;
-				getName(i.getOwner(), userno, isFromPage, ownername, pagename);
+				getName(i->getOwner(), userno, isFromPage, ownername, pagename);
 
 				if (!isFromPage) {
 					for (int p = 0; p < 100; p++) { cout << "-"; }
 					cout << endl;
-					cout << "\n\nPost id: " << i.getId() << "\t\t\t\t Dated : " << i.getDate() << "/" << i.getMonth() << "/" << i.getYear() << "\n\nYour Friend " << ownername << " said: \t\t " << i.getContent() << "\t\tlikes: " << i.getLikes() << "\n ";
+					cout << "\n\nPost id: " << i->getId() << "\t\t\t\t Dated : " << i->getDate() << "/" << i->getMonth() << "/" << i->getYear() << "\n\nYour Friend " << ownername << " said: \t\t " << i->getContent() << "\t\tlikes: " << i->getLikes() << "\n ";
 					
 					switch (a->getNumber())
 					{case 1:
@@ -430,7 +430,7 @@ public:
 				else {
 					for (int p = 0; p < 100; p++) { cout << "-"; }
 					cout << endl;
-					cout << "\n\nPost id: " << i.getId() << "\t\t\t\t Dated : " << i.getDate() << "/" << i.getMonth() << "/" << i.getYear() << "\n\n posted by " << ownername << " on " << pagename << "  :  " << i.getContent() << "\t\tlikes: " << i.getLikes() << "\n ";
+					cout << "\n\nPost id: " << i->getId() << "\t\t\t\t Dated : " << i->getDate() << "/" << i->getMonth() << "/" << i->getYear() << "\n\n posted by " << ownername << " on " << pagename << "  :  " << i->getContent() << "\t\tlikes: " << i->getLikes() << "\n ";
 					switch (a->getNumber())
 					{
 					case 1:
@@ -446,7 +446,7 @@ public:
 					}
 				}
 
-				PrintPostComments(i.getId());
+				PrintPostComments(i->getId());
 
 
 			}
@@ -460,7 +460,7 @@ public:
 			cout << "Enter post id: \t";
 			string id;
 			getline(cin, id);
-			comments_list.push_back(comment("c" + to_string(comments_list.size() + 1), id, users_list[userno].getId(), content));
+			comments_list.push_back(new comment("c" + to_string(comments_list.size() + 1), id, users_list[userno]->getId(), content));
 
 
 			AddCommentToFile();
@@ -485,8 +485,8 @@ public:
 		page* p = nullptr;
 		int count = 0;
 		for (auto& i : pages_list) {
-			if (i.getId() == id) {
-				p = &i;
+			if (i->getId() == id) {
+				p = i;
 				count++;
 				break;
 			}
@@ -497,9 +497,9 @@ public:
 			for (auto& i : p->getPosts()) {
 				post* b = nullptr;
 				for (auto& j : posts_list) {
-					if (j.getId() == i)
+					if (j->getId() == i)
 					{
-						b = &j;
+						b = j;
 					}
 				}
 
@@ -518,7 +518,7 @@ public:
 		system("cls");
 		cout << "Explore Other Pages!!\n\n";
 		for (auto& i : pages_list) {
-			cout << "Id: " << i.getId() << "\t\tName: " << i.getName() << "\t\t" << i.getFollowers() << " Followers" << endl;
+			cout << "Id: " << i->getId() << "\t\tName: " << i->getName() << "\t\t" << i->getFollowers() << " Followers" << endl;
 		}
 		cout << "Enter page id to visit or -1 to exit: \n"; string id; cin >> id;
 		if (id == "-1")
@@ -542,10 +542,10 @@ public:
 			
 			int date = ltm.tm_mday; int month = ltm.tm_mon + 1; int year = ltm.tm_year + 1900;
 
-			if (i.getDate() == date && i.getMonth() == month && i.getYear() != year && i.getOwner() == u->getId()) {
+			if (i->getDate() == date && i->getMonth() == month && i->getYear() != year && i->getOwner() == u->getId()) {
 				// memory found
-				cout << "Memory found! \n\n On this day "<<(year-i.getYear())<<" years ago \n you posted: \n\t\t"<<i.getContent();
-				PrintPostComments(i.getId());
+				cout << "Memory found! \n\n On this day "<<(year-i->getYear())<<" years ago \n you posted: \n\t\t"<<i->getContent();
+				PrintPostComments(i->getId());
 				
 				cout << "Do u want to Share this memory?"<<endl; 
 			
@@ -557,8 +557,8 @@ public:
 						cin.ignore();
 						getline(cin,description); 
 						vector<string> empty;
-						string content = "On this day " + to_string(year - i.getYear()) + " years ago " + u->getId() + " posted: \n\t\t" + i.getContent() + "\n\n" + description;
-						posts_list.push_back(post( ("m" + to_string(posts_list.size() + 1) ), date,month,content,u->getId(),0,0,"",empty, 0,0, year));
+						string content = "On this day " + to_string(year - i->getYear()) + " years ago " + u->getId() + " posted: \n\t\t" + i->getContent() + "\n\n" + description;
+						posts_list.push_back(new post( ("m" + to_string(posts_list.size() + 1) ), date,month,content,u->getId(),0,0,"",empty, 0,0, year));
 						vector<string> newposts = u->getPosts();
 						newposts.push_back("m" + to_string(posts_list.size()));
 						u->setposts(newposts);
@@ -580,18 +580,18 @@ public:
 
 		for (int i = 0; i < 100; i++) { cout << "="; }
 		cout << "\n";
-		cout << "User: " << users_list[userno].getName() << endl;
-		cout << "Id: " << users_list[userno].getId() << endl << endl;
+		cout << "User: " << users_list[userno]->getName() << endl;
+		cout << "Id: " << users_list[userno]->getId() << endl << endl;
 		cout << "Friends list: \n";
-		for (auto& i : users_list[userno].getFriends()) { cout << getUserName(i) << "\n"; }
+		for (auto& i : users_list[userno]->getFriends()) { cout << getUserName(i) << "\n"; }
 		cout << "\nFollowed Pages list: \n";
-		for (auto& i : users_list[userno].getPages()) { cout << getPageName(i) << "\n\n"; }
+		for (auto& i : users_list[userno]->getPages()) { cout << getPageName(i) << "\n\n"; }
 		if (u->getHasPage()) {
 			cout << "Your are the Admin of Following Pages: \n"; 
 			for(auto& i : pages_list)
 			{
-				if (i.getOwner() == u->getId()) {
-				cout<<i.getName()<<"\n";
+				if (i->getOwner() == u->getId()) {
+				cout<<i->getName()<<"\n";
 				}
 			}
 		}
@@ -624,9 +624,9 @@ public:
 		int count = 0;
 		for (auto& i : posts_list) {
 			for (auto& j : u->getPosts()) {
-				if (i.getId() == j) {
-					cout << "You posted: (" << i.getDate() << "/" << i.getMonth() << "/" << i.getYear() << ")\t" << i.getContent() << "\t\tLikes: " << i.getLikes() << "\n\nComments:\n";
-					PrintPostComments(i.getId());
+				if (i->getId() == j) {
+					cout << "You posted: (" << i->getDate() << "/" << i->getMonth() << "/" << i->getYear() << ")\t" << i->getContent() << "\t\tLikes: " << i->getLikes() << "\n\nComments:\n";
+					PrintPostComments(i->getId());
 						count++;
 				}
 			}
@@ -689,7 +689,7 @@ public:
 		}
 
 		// Found user
-		user* u = &users_list[userN0 - 1];
+		user* u = users_list[userN0 - 1];
 		userN0 = userN0 - 1;
 		system("pause");
 		MakeHome(userN0);
@@ -700,3 +700,31 @@ public:
 	// halo
 
 };
+Runner::~Runner() {
+	if (ended) {
+		if (!users_list.empty()) {
+			for (auto& d:users_list) {
+				delete d;
+			}
+			users_list.clear();
+		}
+		if (!pages_list.empty()) {
+			for (auto& d : pages_list) {
+				delete d;
+			}
+			pages_list.clear();
+		}
+		if (!posts_list.empty()) {
+			for (auto& d : posts_list) {
+				delete d;
+			}
+			posts_list.clear();
+		}
+		if (!comments_list.empty()) {
+			for (auto& d : comments_list) {
+				delete d;
+			}
+			comments_list.clear();
+		}
+	}
+}

@@ -3,13 +3,14 @@
 #include <vector>
 #include <string>
 #include "page.h"
+
 using namespace std;
 class user {
 protected:
 	string id;
 	string name;
 	vector<string> friends_list;
-	vector<string> pages_followed; // liked
+	vector<string> pages_followed; 
 	bool has_page;
 	page* homepage;
 	vector<string> posts;
