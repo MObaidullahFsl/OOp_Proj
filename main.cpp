@@ -4,4 +4,5 @@ int main() {
 	Runner r;
 	
 	r.StartApp();
+	r.ended = true;
 }
