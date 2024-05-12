@@ -1,0 +1,15 @@
+﻿  main.cpp
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\post.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'main.cpp')
+  
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(157,25): warning C4129: 'C': unrecognized character escape sequence
+  (compiling source file 'main.cpp')
+  
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(350,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'main.cpp')
+  
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(243,1): warning C4715: 'Runner::UserAuth': not all control paths return a value
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(192,1): warning C4715: 'Runner::getUserName': not all control paths return a value
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(204,1): warning C4715: 'Runner::getPageName': not all control paths return a value
+C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\include\runner.h(307,1): warning C4715: 'Runner::getPostUser': not all control paths return a value
+  Oop_project.vcxproj -> C:\Users\HP\Documents\Repos\oop_Proj\Oop_project\Backup\x64\Debug\Oop_project.exe
