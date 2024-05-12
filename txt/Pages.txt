@@ -1,0 +1,13 @@
+12
+p1	Food Fusion 1 b1 b3 -1 u1 6
+p2	AlJazeera English 1 b2 -1 u2 5
+p3	Allama Iqbal 1 b5 -1 u2 2
+p4	Scholarships for International Students 1 b4 -1 u3 1
+p5	Rumi Quotes 1 b7 -1 u4 2
+p6	Dawn.com 1 b1 b6 -1 u5 0
+p7	People Of Pakistan 1 b8 -1 u6 1
+p8	History 1 b9 -1 u7 1
+p9	BBC News 1 b12 -1 u8 2
+p10	CNN International 1  -1 u9 2
+p11	Birthday Cakes 1 -1 u10 0
+p12	M Ali Jinnah 1 b10 b11 -1 u10 0
