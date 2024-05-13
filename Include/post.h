@@ -16,11 +16,12 @@ protected:
 	int likes;
 	static int total_posts;
 	vector<string> comments;
+	vector<string> likers;
 
 public:
-	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber = 0, string activcontent = "", vector<string> Comments = {}, int hours = 0, int min = 0, int year = 0) : id(ID), content(Content), owner(Owner), likes(Likes), comments(Comments) {
+	post(string ID = "", int Date = 0, int Month = 0, string Content = "", string Owner = "", int Likes = 0, int activnumber = 0, string activcontent = "", vector<string> Comments = {}, int year = 0, vector<string> Likers = {}) : id(ID), content(Content), owner(Owner), likes(Likes), comments(Comments),	likers(Likers) {
 		activity = new activ(activcontent, activnumber);
-		time_added = kronos(year, Month, Date, hours, min);
+		time_added = kronos(year, Month, Date);
 	}
 	~post() {};
 
@@ -33,8 +34,9 @@ public:
 	int getLikes() { return likes; }
 	vector<string> getComments() { return comments; }
 	activ* getActivity() { return activity; }
-
-
+	void setlikes(int x) { likes = x; }
+	vector<string> getLikers() { return likers; }
+	void setLikers(vector<string> x) { likers = x; }
 
 
 };

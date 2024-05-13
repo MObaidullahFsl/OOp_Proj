@@ -31,7 +31,7 @@ public:
 	bool ended = false;
 	void readUsers() {
 		//vector<user> users_list;
-		fstream users_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Backup\\txt\\Users.txt");
+		fstream users_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Final\\txt\\Users.txt");
 		if (users_file.is_open()) {
 
 			users_file >> user::total_users;
@@ -69,7 +69,7 @@ public:
 
 	}
 	void readPages() {
-		fstream pages_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Backup\\txt\\Pages.txt");
+		fstream pages_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Final\\txt\\Pages.txt");
 		if (pages_file.is_open())
 		{
 
@@ -102,42 +102,66 @@ public:
 		
 	}
 	void readPosts() {
-		fstream posts_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Backup\\txt\\Posts.txt");
+		fstream posts_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Final\\txt\\Posts.txt");
 		if (posts_file.is_open())
 		{
 			
 			posts_file >> post::total_posts;
 			for (int i = 0; i < total_posts; i++) {
+
 				string id, content, activ_content, a, owner;
 				int date, month, likes, activ_number, hours, min, year;
-				vector<string> comments;
+				vector<string> comments;vector<string> likers;
+
+				time_t now = time(0);
+				struct tm ltm;
+				localtime_s(&ltm, &now); 
+				int Date = ltm.tm_mday; int Month = ltm.tm_mon + 1; int Year = ltm.tm_year + 1900;
+
 
 				posts_file >> id;
 				posts_file >> likes;
 				posts_file >> year;
-				posts_file >> month;
-				posts_file >> date;
-				posts_file >> hours;
-				posts_file >> min;
-				//posts_file.ignore(256, '\n');
-				getline(posts_file, content, '1');
-				getline(posts_file, activ_content, '1');
-				if (activ_content != " ") {
-					posts_file >> activ_number;
+				if (year > Year ) {
+					year = Year;
 				}
-				else
+				posts_file >> month;
+				if (month > Month && year == Year) {
+				month = Month;
+				}
+				posts_file >> date;
+				if (date > Date && year == Year && month == Month) {
+					date = Date;
+				}
+			
+				//posts_file.ignore(256, '\n');
+				getline(posts_file, content,';');
+				posts_file >> activ_number;
+				if (activ_number > 0) {
+					
+				getline(posts_file, activ_content, ';');
+				}
+				else {
 					activ_number = 0;
+					activ_content = "";
+				}
 				//posts_file >> activ_content;
 				//posts_file.ignore(256, '\n');
 				posts_file >> owner;
 
 				posts_file >> a;
-				while (a != "-1") {
+				while (a != ";") {
 					comments.push_back(a);
 					posts_file >> a;
 				}
+				posts_file >> a;
+				while (a != ";") {
+					likers.push_back(a);
+					posts_file >> a;
+				}
 
-				posts_list.push_back(new post(id, date, month, content, owner, likes, activ_number, activ_content, comments, hours, min, year));
+
+				posts_list.push_back(new post(id, date, month, content, owner, likes, activ_number, activ_content, comments, year, likers));
 
 
 			}
@@ -154,7 +178,7 @@ public:
 		
 	}
 	void readComments() {
-		fstream comments_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Backup\\txt\\Comments.txt");
+		fstream comments_file("C:\\Users\\HP\\Documents\\Repos\\oop_Proj\\Oop_project\\Final\\txt\\Comments.txt");
 
 
 		if (comments_file.is_open())
@@ -203,6 +227,7 @@ public:
 			return "page not found err";
 		}
 	}
+
 	int UserAuth() {
 
 		cout << "Enter Your Username or Id:				-1 to exit \n";
@@ -257,6 +282,7 @@ public:
 
 
 	}
+
 	void MakeHome(int userNo) {
 
 		vector<string> friends = users_list[userNo]->getFriends();
@@ -359,7 +385,7 @@ public:
 		cin.ignore();
 		getline(cin, description);
 		vector<string> empty;
-		posts_list.push_back(new post(("m" + to_string(posts_list.size() + 1)), date, month, description, u->getId(), 0, 0, "", empty, 0, 0, year));
+		posts_list.push_back(new post(("m" + to_string(posts_list.size() + 1)), date, month, description, u->getId(), 0, 0, "", empty, year,empty));
 		vector<string> newposts = u->getPosts();
 		newposts.push_back("m" + to_string(posts_list.size()));
 		u->setposts(newposts);
@@ -370,6 +396,7 @@ public:
 
 	}
 	void PrintPostComments(string id) {
+
 		int count = 0;
 		for (auto& j : comments_list) {
 			if (j->getOwnerPost() == id) {
@@ -473,6 +500,43 @@ public:
 		system("cls");
 		MainMenu(u, userno);
 	}
+	void addCommentPopUp(int userno) {
+	 string choice; cin >> choice;
+		if (choice == "yes" || choice == "y" || choice == "YES" || choice == "Y") {
+
+			cout << "Enter comment: \n";
+			cin.ignore();
+			string content; getline(cin, content);
+			cout << "Enter post id: \t";
+			string id;
+			getline(cin, id);
+			comments_list.push_back(new comment("c" + to_string(comments_list.size() + 1), id, users_list[userno]->getId(), content));
+
+
+			AddCommentToFile();
+		}
+		else {
+
+		}
+	}
+
+
+	void viewLikers(string id) {
+		cout << endl << endl;
+		post* p=nullptr;
+		for (auto& i : posts_list) {
+			if (i->getId() == id) {
+				p = i;
+				break;
+			}
+		}
+		cout << p->getId() << " Liked by: \n";
+		vector<string>likers = p->getLikers();
+			for (auto& i : likers) {
+				string name = getUserName(i);
+				cout << name<<endl;
+			}
+	}
 	void ComposePage() {
 
 	}
@@ -480,6 +544,8 @@ public:
 
 
 	}
+
+
 	void PageView(string id, int userno, user* u) {
 		system("cls");
 		page* p = nullptr;
@@ -514,6 +580,77 @@ public:
 		system("pause");
 		MainMenu(u, userno);
 	}
+	void viewPost (user* u,int userno, string postid) {
+		post* p=nullptr;
+		for (auto& i : posts_list) {
+			if (i->getId() == postid) {
+				p = i;
+			break;
+			}
+		}
+		activ* a = p->getActivity();
+		string name = getUserName(p->getOwner());
+		for (int i = 0; i < 100; i++) { cout << "-"; };
+		cout << "\nPost id: " << p->getId() << "\t\t\t\t Dated : " << p->getDate() << "/" << p->getMonth() << "/" << p->getYear() << "\n\nPosted by " << name << " : \t\t " << p->getContent() << "\t\tlikes: " << p->getLikes() << "\n ";
+		switch (a->getNumber())
+		{
+		case 1:
+			cout << name << " is feeling " << a->getContent() << " \n";
+				break;
+		case 2:
+			cout << name << " is thinking about " << a->getContent() << " \n";
+			break;
+		case 3:
+			cout << name << " is Making " << a->getContent() << " \n";
+			break;
+		case 4:
+			cout << name << " is celebrating a " << a->getContent() << " \n";
+			break;
+		default:
+			break;
+		}
+	
+		cout<<"\n comments : \n";
+	PrintPostComments(p->getId());
+
+		cout<<"\nEnter 1 to like the post, 2 to add a comment, 3 to view likes, anyother to exit\n";
+		int b; cin >> b; int count = 0; vector<string> likers = p->getLikers();
+		switch (b)
+		{
+		case 1:
+			count = 0;
+			for (auto& i : p->getLikers()) {
+				if (i==u->getId())
+				{
+					cout << "Already Liked by you!\n";
+					count++;
+					break;
+				}
+			}
+			if (count ==0) {
+				cout << "\t Liked!! \n\n";
+				likers.push_back(u->getId());
+				p->setLikers(likers);
+			p->setlikes(p->getLikes() + 1);
+			break;
+			}
+		case 2:
+			addCommentPopUp(userno);
+			break;
+		case 3:
+			viewLikers(p->getId());
+			break;
+		default:
+
+			break;
+		}
+
+system("pause");
+		MainMenu(u, userno);
+		
+	}
+
+
 	void Explore(int userno, user* u) {
 		system("cls");
 		cout << "Explore Other Pages!!\n\n";
@@ -558,7 +695,7 @@ public:
 						getline(cin,description); 
 						vector<string> empty;
 						string content = "On this day " + to_string(year - i->getYear()) + " years ago " + u->getId() + " posted: \n\t\t" + i->getContent() + "\n\n" + description;
-						posts_list.push_back(new post( ("m" + to_string(posts_list.size() + 1) ), date,month,content,u->getId(),0,0,"",empty, 0,0, year));
+						posts_list.push_back(new post( ("m" + to_string(posts_list.size() + 1) ), date,month,content,u->getId(),0,0,"",empty, year,empty));
 						vector<string> newposts = u->getPosts();
 						newposts.push_back("m" + to_string(posts_list.size()));
 						u->setposts(newposts);
@@ -638,10 +775,12 @@ public:
 		cin.ignore();
 		MainMenu(u, userno);
 	}
+
+
 	void MainMenu(user* u, int userN0) {
 		
 		system("cls");
-		cout << "\t\t\t\t* <MAIN MENU>*\n"; for (int i = 0; i < 100; i++) { cout << "="; }; cout << "\n\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View a Page \n 6. View TimeLine \n 7.Compose Post \n 8. Logout \nany another to exit\n";
+		cout << "\t\t\t\t* <MAIN MENU>*\n"; for (int i = 0; i < 100; i++) { cout << "="; }; cout << "\n\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View a Page \n 6. View TimeLine \n 7.Compose Post \n 8. View a Post \n 9. LogOut\n any another to exit\n";
 		
 		int a; cin >> a;
 		string id;
@@ -668,8 +807,14 @@ public:
 		case 7:
 			ComposePost(u, userN0);
 			break;
-		case 8:
+		case 9:
 			StartApp();
+			break;
+		case 8:
+			cout << "Enter post id: \n";
+			cin >> id;
+			viewPost(u, userN0,id);
+				break;
 		default:
 			exit(0);
 		}

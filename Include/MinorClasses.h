@@ -34,7 +34,7 @@ public:
 	timeString = buffer;*/
 
 	}
-	kronos(int Year = 0, int Month = 0, int Date = 0, int Hour = 0, int Min = 0) : year(Year), month(Month), date(Date), hour(Hour), min(Min) {
+	kronos(int Year = 0, int Month = 0, int Date = 0) : year(Year), month(Month), date(Date) {
 
 	}
 	int getDate() { return date; }
