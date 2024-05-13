@@ -143,6 +143,8 @@ public:
 				}
 				else {
 					activ_number = 0;
+					string b;
+					posts_file >> b;
 					activ_content = "";
 				}
 				//posts_file >> activ_content;
@@ -267,13 +269,13 @@ public:
 			}
 		}
 	}
-	bool DateAuthHome(post i) {
+	bool DateAuthHome(post *i) {
 		time_t now = time(0);
 		struct tm ltm;
 		localtime_s(&ltm, &now); // Corrected usage of localtime_s
 		int date = ltm.tm_mday; int month = ltm.tm_mon + 1; int year = ltm.tm_year + 1900;
 
-		if (year == i.getYear() && month == i.getMonth() && (date == i.getDate()) || (date - 1 == i.getDate())) {
+		if (year == i->getYear() && month == i->getMonth() &&( (date == i->getDate()) || (date - 1 == i->getDate() ) ) ) {
 			return true;
 		}
 		else
@@ -283,9 +285,9 @@ public:
 
 	}
 
-	void MakeHome(int userNo) {
+	void MakeHome(int userNo,user* u) {
 
-		vector<string> friends = users_list[userNo]->getFriends();
+		vector<string> friends = u->getFriends();
 		vector<page> followed_pages;
 		for (auto& j : pages_list) {
 			for (auto& k : users_list[userNo]->getPages()) {
@@ -296,23 +298,28 @@ public:
 
 		}
 
-
+		int count = 0;
 		for (auto& i : posts_list) {
-			if (DateAuthHome(*i)) {
+			count = 0;
+			if (DateAuthHome(i)) {
 				for (auto& j : friends) {
 
 					if (j == i->getOwner()) {
 						home_posts.push_back(i);
+						count++;
+						break;
 					}
 
 				}
-				for (auto& j : followed_pages) {
-					for (auto& k : j.getPosts()) {
-						if (i->getId() == k) {
-							home_posts.push_back(i);
+				if (count == 0) {
+					for (auto& j : followed_pages) {
+						for (auto& k : j.getPosts()) {
+							if (i->getId() == k) {
+								home_posts.push_back(i);
+							}
 						}
-					}
 
+					}
 				}
 			}
 		}
@@ -332,13 +339,14 @@ public:
 			return "user not found err";
 		}
 	}
-	void getName(string id, int userno, bool& isPage, string& ownername, string& pagename) {
+	void getName(string id, user* u, bool& isPage, string& ownername, string& pagename) {
 		// is this post of our friend?
 
-		for (auto& i : users_list[userno]->getFriends()) {
+		for (auto& i : u->getFriends()) {
 			if (id == i) {
 				// is our friend
-				ownername = i;
+				string name = getUserName(id);
+				ownername = name ;
 				isPage = false;
 				return;
 
@@ -348,7 +356,7 @@ public:
 		// must be a page we follows post
 		vector<page> followed_pages;
 		for (auto& j : pages_list) {
-			for (auto& k : users_list[userno]->getPages()) {
+			for (auto& k : u->getPages()) {
 				if (j->getId() == k) {
 					followed_pages.push_back(*j);
 				}
@@ -369,6 +377,18 @@ public:
 		}
 
 
+	}
+	bool cinDiag() {
+		if (cin.fail()) {
+			cin.clear(); // Clear the error state
+			cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+			
+		return false;
+		}
+		else {
+			return true;
+			// Process the input as needed
+		}
 	}
 
 	void AddCommentToFile() {
@@ -432,7 +452,7 @@ public:
 				bool isFromPage = false;
 				activ* a = i->getActivity();
 				string pagename, ownername; int c = 0;
-				getName(i->getOwner(), userno, isFromPage, ownername, pagename);
+				getName(i->getOwner(), u, isFromPage, ownername, pagename);
 
 				if (!isFromPage) {
 					for (int p = 0; p < 100; p++) { cout << "-"; }
@@ -440,14 +460,19 @@ public:
 					cout << "\n\nPost id: " << i->getId() << "\t\t\t\t Dated : " << i->getDate() << "/" << i->getMonth() << "/" << i->getYear() << "\n\nYour Friend " << ownername << " said: \t\t " << i->getContent() << "\t\tlikes: " << i->getLikes() << "\n ";
 					
 					switch (a->getNumber())
-					{case 1:
-						cout << ownername<<" is feeling "<< a->getContent() << " \n\n comments : \n";
+					{
+					case 1:
+						cout << ownername << " is feeling " << a->getContent() << " \n";
+						break;
 					case 2:
-						cout << ownername << " is thinking about " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is thinking about " << a->getContent() << " \n";
+						break;
 					case 3:
-						cout << ownername << " is Making " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is Making " << a->getContent() << " \n";
+						break;
 					case 4:
-						cout << ownername << " is celebrating a " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is celebrating a " << a->getContent() << " \n";
+						break;
 					default:
 						break;
 					}
@@ -461,13 +486,17 @@ public:
 					switch (a->getNumber())
 					{
 					case 1:
-						cout << ownername << " is feeling " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is feeling " << a->getContent() << " \n";
+						break;
 					case 2:
-						cout << ownername << " is thinking about " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is thinking about " << a->getContent() << " \n";
+						break;
 					case 3:
-						cout << ownername << " is Making " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is Making " << a->getContent() << " \n";
+						break;
 					case 4:
-						cout << ownername << " is celebrating a " << a->getContent() << " \n\n comments : \n";
+						cout << ownername << " is celebrating a " << a->getContent() << " \n";
+						break;
 					default:
 						break;
 					}
@@ -478,25 +507,68 @@ public:
 
 			}
 
-		cout << "Add Comment? \n"; string choice; cin >> choice;
-			if (choice == "yes" || choice == "y" || choice == "YES" || choice == "Y") {
 
-			cout << "Enter comment: \n";
-			cin.ignore();
-			string content; getline(cin, content);
-			cout << "Enter post id: \t";
-			string id;
-			getline(cin, id);
-			comments_list.push_back(new comment("c" + to_string(comments_list.size() + 1), id, users_list[userno]->getId(), content));
+		
 
-
-			AddCommentToFile();
-			}
-			else {
-			
-			}
-
+		cout << "\nEnter 1 to like a post, 2 to add a comment, 3 to view likes, any other number to exit\n";
+		int b; cin >> b; vector<string> likers; post* p = nullptr;
+		bool works = cinDiag();
+		while (!works) {
+			cout << "Invalid input. Please enter a number." << endl;
+			cin >> b;
+			works = cinDiag();
 		}
+		if (b>0 && b<4) {
+			cout << "Enter Post Id: \n"; string id; cin >> id;
+
+			for (auto& i : posts_list) {
+				if (i->getId() == id) {
+					p = i;
+					likers = p->getLikers();
+					break;
+				}
+			}
+		}
+		else if (b>10) {
+			cout << endl;
+			cin.ignore();
+		}
+		 int count = 0; 
+		switch (b)
+		{
+		case 1:
+			count = 0;
+			for (auto& i : p->getLikers()) {
+				if (i == u->getId())
+				{
+					cout << "Already Liked by you!\n";
+					count++;
+					break;
+				}
+			}
+			if (count == 0) {
+				cout << "\t Liked!! \n\n";
+				likers.push_back(u->getId());
+				p->setLikers(likers);
+				p->setlikes(p->getLikes() + 1);
+				break;
+			}
+		case 2:
+			addCommentPopUp(userno);
+			break;
+		case 3:
+			viewLikers(p->getId());
+			break;
+		default:
+
+			
+			
+			break;
+		}
+		}
+
+
+		cin.ignore();
 		system("cls");
 		MainMenu(u, userno);
 	}
@@ -568,9 +640,64 @@ public:
 						b = j;
 					}
 				}
+				for (int i = 0; i < 100; i++) { cout << "-"; };
+				
+				activ * a = b->getActivity();
+				string name = getUserName(b->getId());
+				cout << "\nPost id: " << b->getId() << "\t\t\t\t Dated : " << b->getDate() << "/" << b->getMonth() << "/" << b->getYear() << "\n\nPosted by " << name << " : \t\t " << b->getContent() << "\t\tlikes: " << b->getLikes() << "\n ";
+				switch (a->getNumber())
+				{
+				case 1:
+					cout << name << " is feeling " << a->getContent() << " \n";
+					break;
+				case 2:
+					cout << name << " is thinking about " << a->getContent() << " \n";
+					break;
+				case 3:
+					cout << name << " is Making " << a->getContent() << " \n";
+					break;
+				case 4:
+					cout << name << " is celebrating a " << a->getContent() << " \n";
+					break;
+				default:
+					break;
+				}
 
-				cout << "\nPosted by: " << b->getOwner() << " \nPost id: " << b->getId() << "\t\t\t Dated : " << b->getDate() << "/" << b->getMonth() << "/" << b->getYear() << "\n\n " << b->getContent() << "\t\tlikes: " << b->getLikes() << "\n\n comments : \n";
+				cout << "\n comments : \n";
 				PrintPostComments(b->getId());
+
+				cout << "\nEnter 1 to like the post, 2 to add a comment, 3 to view likes, anyother to exit\n";
+				int c; cin >> c; int count = 0; vector<string> likers = b->getLikers();
+				switch (c)
+				{
+				case 1:
+					count = 0;
+					for (auto& i : b->getLikers()) {
+						if (i == u->getId())
+						{
+							cout << "Already Liked by you!\n";
+							count++;
+							break;
+						}
+					}
+					if (count == 0) {
+						cout << "\t Liked!! \n\n";
+						likers.push_back(u->getId());
+						b->setLikers(likers);
+						b->setlikes(b->getLikes() + 1);
+						break;
+					}
+				case 2:
+					addCommentPopUp(userno);
+					break;
+				case 3:
+					viewLikers(p->getId());
+					break;
+				default:
+
+					break;
+				}
+				
 			}
 		}
 		else {
@@ -582,12 +709,15 @@ public:
 	}
 	void viewPost (user* u,int userno, string postid) {
 		post* p=nullptr;
+		int count = 0;
 		for (auto& i : posts_list) {
 			if (i->getId() == postid) {
 				p = i;
+				count++;
 			break;
 			}
 		}
+		if (count == 1) {
 		activ* a = p->getActivity();
 		string name = getUserName(p->getOwner());
 		for (int i = 0; i < 100; i++) { cout << "-"; };
@@ -645,6 +775,8 @@ public:
 			break;
 		}
 
+		}else
+			cout<<	"post not found!!"<<"\n\n";
 system("pause");
 		MainMenu(u, userno);
 		
@@ -780,8 +912,8 @@ system("pause");
 	void MainMenu(user* u, int userN0) {
 		
 		system("cls");
-		cout << "\t\t\t\t* <MAIN MENU>*\n"; for (int i = 0; i < 100; i++) { cout << "="; }; cout << "\n\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View a Page \n 6. View TimeLine \n 7.Compose Post \n 8. View a Post \n 9. LogOut\n any another to exit\n";
-		
+		cout << "\t\t\t\t****MAIN MENU****\n"; for (int i = 0; i < 100; i++) { cout << "="; }; cout << "\n\t\tSelect an option: \n 1. Go Home \n 2. Explore \n 3. View Profile \n 4. Share Memories  \n 5. View a Page \n 6. View TimeLine \n 7.Compose Post \n 8. View a Post \n 9. LogOut\n any another to exit\n";
+		//cin.ignore();
 		int a; cin >> a;
 		string id;
 		switch (a)
@@ -837,7 +969,7 @@ system("pause");
 		user* u = users_list[userN0 - 1];
 		userN0 = userN0 - 1;
 		system("pause");
-		MakeHome(userN0);
+		MakeHome(userN0,u);
 		MainMenu(u, userN0);
 
 
