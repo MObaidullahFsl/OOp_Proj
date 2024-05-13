@@ -1,4 +1,14 @@
-This is the begining of my oop project 
-it is a social media app centered around a programmer, dark web aesthetic
 
-![scary hacker man](https://media.giphy.com/media/B4dt6rXq6nABilHTYM/giphy.gif)
+#OOP PROJECT:
+
+##Intro:
+Named as The Neighbours Nexus This app is based upon Object Oriented Programming Functionalities.
+
+##Features:
+-You can sign in as an existing user, sign up as a new user.
+-See Pages, Follow Pages.
+-Make Posts, see made posts, like post
+-See friends
+-rm OS
+-Log out
+-Run app
